@@ -1,44 +1,41 @@
 import React from 'react';
 import { screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import drinkCategories from '../../cypress/mocks/drinkCategories';
 import renderWithRouter from '../helpers/renderWithRouter';
 import Provider from '../contexts/MyProvider';
-import mockDataDrinks from '../helpers/mockDataDrinks';
-import Drinks from '../pages/Drinks';
-import mockDrinksFirstLetter from '../helpers/MockDrinksFirstLetter';
+import mockMealsFirstLetterW from '../helpers/mockMealFirtsLetterW';
+import Meals from '../pages/Meals';
+import mealCategories from '../../cypress/mocks/mealCategories';
+import mockDataMeals from '../helpers/mockDataMeals';
 
 const testIdInput = 'search-input';
 const testIdSearchButton = 'exec-search-btn';
+const routDetail = '/meals/52940';
+
 async function fetchData() {
-  const response = await fetch('https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=11007');
+  const response = await fetch('https://www.themealdb.com/api/json/v1/1/lookup.php?i=52940');
   const data = await response.json();
   return data;
 }
-
-const routDetail = '/drinks/11007';
-
-describe('Testa página Drinks', () => {
-  test('teste se os elementos na tela de Drinks estão sendo renderizados', async () => {
+describe('Testa página Meals', () => {
+  test('teste se os elementos na tela de Meals estão sendo renderizados', async () => {
     const { history } = renderWithRouter(
       <Provider>
-        <Drinks />
+        <Meals />
       </Provider>,
     );
 
     global.fetch = jest.fn(() => Promise.resolve({
-      json: () => Promise.resolve(drinkCategories) }));
+      json: () => Promise.resolve(mealCategories) }));
     act(() => {
-      history.push('/drinks');
+      history.push('/meals');
     });
 
-    const buttonOrdinary = await screen.findByRole('button', {
-      name: /ordinary drink/i,
-    });
-    const buttonCocktail = await screen.getByRole('button', { name: /cocktail/i });
-    const buttonShake = await screen.getByRole('button', { name: /shake/i });
-    const buttonOther = await screen.getByRole('button', { name: /other \/ unknown/i });
-    const buttonCocoa = await screen.getByRole('button', { name: /cocoa/i });
+    const buttonBeef = await screen.findByRole('button', { name: /beef/i });
+    const buttonBreakfest = await screen.getByRole('button', { name: /breakfast/i });
+    const buttonChicken = await screen.getByRole('button', { name: /chicken/i });
+    const buttonDessert = await screen.getByRole('button', { name: /dessert/i });
+    const buttonGoat = await screen.getByRole('button', { name: /goat/i });
     const buttonAll = await screen.getByRole('button', { name: /all/i });
     const recipeCardDrink = await screen.findByTestId('0-recipe-card');
     expect(recipeCardDrink).toBeInTheDocument();
@@ -49,11 +46,11 @@ describe('Testa página Drinks', () => {
     const titleDrink0 = await screen.findByTestId('0-card-name');
     const titleDrink11 = await screen.findByTestId('11-card-name');
 
-    expect(buttonOrdinary).toBeInTheDocument();
-    expect(buttonCocktail).toBeInTheDocument();
-    expect(buttonShake).toBeInTheDocument();
-    expect(buttonOther).toBeInTheDocument();
-    expect(buttonCocoa).toBeInTheDocument();
+    expect(buttonBeef).toBeInTheDocument();
+    expect(buttonBreakfest).toBeInTheDocument();
+    expect(buttonChicken).toBeInTheDocument();
+    expect(buttonDessert).toBeInTheDocument();
+    expect(buttonGoat).toBeInTheDocument();
     expect(buttonAll).toBeInTheDocument();
     expect(cardImage0).toBeInTheDocument();
     expect(cardImage11).toBeInTheDocument();
@@ -63,59 +60,64 @@ describe('Testa página Drinks', () => {
   test('teste se o resultado dos filtro first letter está certo', async () => {
     const { history } = renderWithRouter(
       <Provider>
-        <Drinks />
+        <Meals />
       </Provider>,
     );
 
     global.fetch = jest.fn(() => Promise.resolve({
-      json: () => Promise.resolve(mockDrinksFirstLetter) }));
+      json: () => Promise.resolve(mockMealsFirstLetterW) }));
 
     act(() => {
-      history.push('/drinks');
+      history.push('/meals');
     });
     const buttonSearchImg = screen.getByRole('img', { name: /search/i });
     userEvent.click(buttonSearchImg);
-    const radioFirstLetter = await screen.findByRole('radio', { name: /first letter/i });
     const inputSearch = await screen.findByTestId(testIdInput);
+    const radioFirstLetter = await screen.findByRole('radio', { name: /first letter/i });
 
     userEvent.click(radioFirstLetter);
-    userEvent.type(inputSearch, 'y');
-    expect(inputSearch).toHaveValue('y');
+    userEvent.type(inputSearch, 'w');
+    expect(inputSearch).toHaveValue('w');
     const buttonSearch = screen.getByTestId(testIdSearchButton);
     userEvent.click(buttonSearch);
-    const endPoint = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?f=y';
+    const endPointMeals = 'https://www.themealdb.com/api/json/v1/1/search.php?f=w';
     expect(fetch).toHaveBeenCalled();
-    expect(fetch).toHaveBeenCalledWith(endPoint);
+    expect(fetch).toHaveBeenCalledWith(endPointMeals);
 
-    const drink1Img = await screen.findByRole('img', {
-      name: /yellow bird/i,
-    });
-    const drink2Img = await screen.findByRole('img', {
-      name: /yoghurt cooler/i,
-    });
-    expect(drink1Img).toBeInTheDocument();
-    expect(drink2Img).toBeInTheDocument();
+    const cardImage0 = await screen.findByRole('img', { name: /white chocolate creme brulee/i });
+    const cardImage1 = await screen.findByRole('img', { name: /wontons/i });
+    const cardImage2 = await screen.findByTestId('2-card-img');
+    const title0 = await screen.getByText(/white chocolate creme brulee/i);
+    const title1 = await screen.getByText(/wontons/i);
+    const title2 = await screen.getByText(/walnut roll gužvara/i);
+
+    expect(cardImage0).toBeInTheDocument();
+    expect(cardImage1).toBeInTheDocument();
+    expect(cardImage2).toBeInTheDocument();
+    expect(title0).toBeInTheDocument();
+    expect(title1).toBeInTheDocument();
+    expect(title2).toBeInTheDocument();
   });
 
   test('teste se os compononentes da tela de detalhes.', async () => {
     const { history } = renderWithRouter(
       <Provider>
-        <Drinks />
+        <Meals />
       </Provider>,
 
     );
     jest.spyOn(window, 'fetch').mockResolvedValue({
       ok: true,
-      json: async () => mockDataDrinks,
+      json: async () => mockDataMeals,
     });
 
     const data = await fetchData();
 
-    expect(data).toEqual(mockDataDrinks);
+    expect(data).toEqual(mockDataMeals);
 
     history.push(routDetail);
     const { pathname } = history.location;
-    expect(pathname).toBe(routDetail);
+    expect(pathname).toBe('/meals/52940');
 
     act(async () => {
       const title = await screen.findByTestId('recipe-photo');
@@ -132,17 +134,17 @@ describe('Testa página Drinks', () => {
       const buttonStart = await screen.getByRole('button', { name: /start/i });
 
       expect(title).toBeInTheDocument();
-      expect(title).toHaveValue('Margarita');
+      expect(title).toHaveValue('Brown Stew Chicken');
 
       expect(imgRecipe).toBeInTheDocument();
       expect(video).toBeInTheDocument();
       expect(instructions).toBeInTheDocument();
 
       expect(ingredient1).toBeInTheDocument();
-      expect(ingredient1).toHaveValue('Tequila');
+      expect(ingredient1).toHaveValue('Chicken');
 
       expect(ingredient2).toBeInTheDocument();
-      expect(ingredient2).toHaveValue('Salt');
+      expect(ingredient2).toHaveValue('Tomato');
 
       expect(titleRecommedation1).toBeInTheDocument();
       expect(recommendation1).toBeInTheDocument();

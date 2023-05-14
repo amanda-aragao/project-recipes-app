@@ -6,7 +6,6 @@ import Meals from '../pages/Meals';
 import Provider from '../contexts/MyProvider';
 import mockMealsName from '../helpers/MockMealsName';
 import App from '../App';
-// import oneMeal from '../../cypress/mocks/oneMeal';
 import mockMealsIngredient from '../helpers/MockMealsIngredient';
 import mockMealsFirstLetter from '../helpers/MockMealsFirstLetter';
 import emptyMeals from '../../cypress/mocks/emptyMeals';
