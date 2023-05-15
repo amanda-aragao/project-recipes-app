@@ -40,10 +40,13 @@ describe('Testa página Drinks', () => {
     const buttonOther = await screen.getByRole('button', { name: /other \/ unknown/i });
     const buttonCocoa = await screen.getByRole('button', { name: /cocoa/i });
     const buttonAll = await screen.getByRole('button', { name: /all/i });
+
     const recipeCardDrink = await screen.findByTestId('0-recipe-card');
     expect(recipeCardDrink).toBeInTheDocument();
+
     const recipeCardDrink11 = await screen.findByTestId('11-recipe-card');
     expect(recipeCardDrink11).toBeInTheDocument();
+
     const cardImage0 = await screen.findByTestId('0-card-img');
     const cardImage11 = await screen.findByTestId('11-card-img');
     const titleDrink0 = await screen.findByTestId('0-card-name');
