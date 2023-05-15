@@ -1,25 +1,51 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import copy from 'clipboard-copy';
+import { useHistory, useParams } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import Recommendations from './Recommendations';
+import shareIcon from '../images/shareIcon.svg';
 import context from '../contexts/MyContext';
+import './Footer.css';
+import whiteHeartIcon from '../images/whiteHeartIcon.svg';
+import blackHeartIcon from '../images/blackHeartIcon.svg';
 
-function MealDetails() {
-  const { id } = useParams(); // Hoock usado para pegar o ID que está na URL exemplo e logo em seguida fazer o fetch usando o mesmo
+function MealDetails({ pathname }) {
+  const { id } = useParams(); // Hook usado para pegar o ID que está na URL exemplo e logo em seguida fazer o fetch usando o mesmo
+  const history = useHistory();
 
   const [recipeArrayMeal, setRecipeArrayMeal] = useState([]);
   const [recipeObjectMeal, setRecipeObjectMeal] = useState({});
+  const [verifyInProgress, setVerifyInProgress] = useState(false);
+  const [verifyIsFavorite, setVerifyIsFavorite] = useState(false);
+  const [favorites, setFavorites] = useState([]); /* Array onde irei guardar meus favoritos */
   const { dataDrinks } = useContext(context);
+  const [clipboard, setClipboard] = useState('');
+
+  const clipboardClick = () => {
+    copy(`http://localhost:3000/meals/${id}`);
+    setClipboard('Link copied!');
+  };
 
   useEffect(() => {
     const fetchApi = async () => {
       const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
       const data = await response.json();
-      console.log(data.meals);
       setRecipeArrayMeal([...data.meals]);
       setRecipeObjectMeal(...data.meals);
     };
     fetchApi();
   }, [id]);
+
+  useEffect(() => {
+    const getIdDoneRecipe = JSON
+      .parse(localStorage.getItem('inProgressRecipes')) || {};
+
+    if (!Object.keys(getIdDoneRecipe).includes('meals')) {
+      setVerifyInProgress(false);
+    } else {
+      setVerifyInProgress(Object.keys(getIdDoneRecipe.meals).includes(id));
+    }
+  }, []);
 
   const objectEntries = Object.entries(recipeObjectMeal);
 
@@ -30,6 +56,38 @@ function MealDetails() {
   const getMeasures = objectEntries
     .filter((measure) => measure[0].includes('strMeasure'))
     .filter((measure) => measure[1] !== ' ');
+
+  useEffect(() => {
+    const getFavoritesFromLocalStorage = JSON
+      .parse(localStorage.getItem('favoriteRecipes')) || [];
+    setFavorites(getFavoritesFromLocalStorage);
+
+    const checkedIsFavorite = getFavoritesFromLocalStorage
+      .some((recipe) => recipe.id === id);
+    setVerifyIsFavorite(checkedIsFavorite);
+  }, [id]);
+
+  const handleClick = () => {
+    if (verifyIsFavorite) {
+      const updateFavorites = favorites.filter((recipe) => recipe.id !== id);
+      setFavorites(updateFavorites);
+      localStorage.setItem('favoriteRecipes', JSON.stringify(updateFavorites));
+      setVerifyIsFavorite(false);
+    } else {
+      const setFavoritesLocalStorage = [...favorites, {
+        id: recipeObjectMeal.idMeal,
+        type: 'meal',
+        nationality: recipeObjectMeal.strArea,
+        category: recipeObjectMeal.strCategory,
+        alcoholicOrNot: '',
+        name: recipeObjectMeal.strMeal,
+        image: recipeObjectMeal.strMealThumb,
+      }];
+      setFavorites(setFavoritesLocalStorage);
+      localStorage.setItem('favoriteRecipes', JSON.stringify(setFavoritesLocalStorage));
+      setVerifyIsFavorite(true);
+    }
+  };
 
   return (
     <div>
@@ -50,6 +108,17 @@ function MealDetails() {
               <p data-testid="recipe-category">
                 {strCategory}
               </p>
+              <button
+                type="button"
+                data-testid="share-btn"
+                onClick={ clipboardClick }
+              >
+                <img
+                  src={ shareIcon }
+                  alt="shareIcon"
+                />
+              </button>
+              <p>{ clipboard }</p>
               <p data-testid="instructions">
                 {strInstructions}
               </p>
@@ -69,6 +138,18 @@ function MealDetails() {
               >
                 Click me
               </iframe>
+              <button
+                onClick={ handleClick }
+                type="button"
+                data-testid="favorite-btn"
+                src={ verifyIsFavorite ? blackHeartIcon : whiteHeartIcon }
+              >
+                <img
+                  src={ verifyIsFavorite ? blackHeartIcon : whiteHeartIcon }
+                  alt={ verifyIsFavorite ? 'blackHeartIcon' : 'whiteHeartIcon' }
+                />
+
+              </button>
             </div>
           ),
         )}
@@ -94,10 +175,26 @@ function MealDetails() {
           ))
         }
       </div>
-      <button className="start-recipe-btn" data-testid="start-recipe-btn">Start</button>
+
       <Recommendations data={ dataDrinks } pageTypes="drinks" />
+
+      <button
+        type="button"
+        className="btn"
+        data-testid="start-recipe-btn"
+        onClick={ () => history.push(`${pathname}/in-progress`) }
+      >
+        {
+          verifyInProgress ? 'Continue Recipe' : 'Start Recipe'
+        }
+      </button>
+
     </div>
   );
 }
+
+MealDetails.propTypes = {
+  pathname: PropTypes.func,
+}.isRequired;
 
 export default MealDetails;
