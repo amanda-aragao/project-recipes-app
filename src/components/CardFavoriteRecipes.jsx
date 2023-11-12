@@ -41,16 +41,6 @@ function CardFavoriteRecipes() {
     setArrayFavorite(arrayFiltered);
   };
 
-  // const handleClick = (param) => {
-  //   if (param === 'Meals') {
-  //     setArrayFavorite(arrayFavorite.filter((element) => element.type === 'meal'));
-  //   } if (param === 'Drinks') {
-  //     setArrayFavorite(arrayFavorite.filter((element) => element.type === 'drink'));
-  //   } if (param === 'All') {
-  //     setArrayFavorite(filteredArray);
-  //   }
-  // };
-
   const handleClick = (param) => {
     switch (param) {
     case 'Meals':

@@ -5,6 +5,7 @@ import profile from '../images/profileIcon.svg';
 import search from '../images/searchIcon.svg';
 import SearchBar from './SearchBar';
 import context from '../contexts/MyContext';
+import icon from '../images/Recipes Icon.png';
 
 function Header({ title, searchIcon }) {
   const { setInputApi } = useContext(context);
@@ -24,41 +25,53 @@ function Header({ title, searchIcon }) {
   };
 
   return (
-    <div>
+    <nav className="nav-bar">
       <h1
+        id="margin"
+        className="title is-3 white"
         data-testid="page-title"
       >
+        <img className="icon" src={ icon } alt="" />
         { title }
       </h1>
-      <button
-        type="button"
-        onClick={ historyPush }
-        data-testid="profile-button"
-      >
-        <img
-          src={ profile }
-          alt="perfil"
-          data-testid="profile-top-btn"
-        />
-      </button>
-      {
-        searchIcon && (
-          <button
-            type="button"
-            onClick={ searchInput }
-            data-testid="search-button"
-          >
-            <img
-              src={ search }
-              alt="search"
-              data-testid="search-top-btn"
-            />
-          </button>
-        )
-      }
+
+      <div className="buttons-header">
+        <button
+          className="button is-rounded pink-button"
+          type="button"
+          onClick={ historyPush }
+          data-testid="profile-button"
+        >
+          <img
+            className="inverted"
+            src={ profile }
+            alt="perfil"
+            data-testid="profile-top-btn"
+          />
+        </button>
+        {
+          searchIcon && (
+            <button
+              className="button is-rounded pink-button"
+              type="button"
+              onClick={ searchInput }
+              data-testid="search-button"
+            >
+              <img
+                className="inverted"
+                src={ search }
+                alt="search"
+                data-testid="search-top-btn"
+              />
+            </button>
+          )
+        }
+      </div>
+
       {
         inputSearch && (
           <input
+            className="input form-input"
             type="text"
             data-testid="search-input"
             onChange={ handleInput }
@@ -68,7 +81,7 @@ function Header({ title, searchIcon }) {
       {
         inputSearch && (<SearchBar />)
       }
-    </div>
+    </nav>
   );
 }
 
